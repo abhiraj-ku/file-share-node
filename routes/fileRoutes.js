@@ -1,8 +1,9 @@
 import express from "express";
-import { fileUpload } from "../controllers/fileController.js";
+import { fileUpload, sendfileViaEmail } from "../controllers/fileController.js";
 
 const router = express.Router();
 
-router.post("/", fileUpload);
+router.post("/upload", fileUpload);
+router.post("/send", sendfileViaEmail);
 
 export default router;
