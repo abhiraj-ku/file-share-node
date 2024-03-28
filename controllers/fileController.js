@@ -16,36 +16,39 @@ const storage = multer.diskStorage({
 });
 
 //uploader with options to check the
-const upload = multer({
-  storage,
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
-    if (!allowedTypes.includes(file.mimetype)) {
-      return cb(
-        "Invalid file type. Only JPEG, PNG, and PDF files are allowed."
-      );
-    }
-  },
+export const fileUpload = async (req, res, next) => {
+  try {
+    upload(req, res, async (err) => {
+      if (err) {
+        console.error("File upload error:", err);
+        return res.status(500).send({ error: "File upload failed" });
+      }
 
-  limits: { fileSize: 100 * 1024 * 1024 }, //100mb limit
-}).single("myFile");
+      // File validation
+      if (!req.file) {
+        return res.status(400).send({ error: "No file uploaded" });
+      }
 
-// controller to handle fileupload
-const fileUpload = async (req, res, next) => {
-  upload(req, res, async (err) => {
-    if (err) {
-      return res.status(500).send({ error: err.message });
-    }
-    const file = new File({
-      filename: req.file.filename,
-      uuid: uuidv4(),
-      path: req.file.path,
-      size: req.file.size,
+      // Save file details to the database
+      const file = new File({
+        filename: req.file.filename,
+        uuid: uuidv4(),
+        path: req.file.path,
+        size: req.file.size,
+      });
+
+      const savedFile = await file.save();
+
+      // Return the file URL to the client
+      res.json({
+        fileUrl: `${process.env.APP_BASE_URL}/files/${savedFile.uuid}`,
+      });
     });
-
-    const response = await file.save();
-    res.json({ file: `${process.env.APP_BASE_URL}/files/${response.uuid}` });
-  });
+  } catch (error) {
+    console.error("File upload controller error:", error);
+    res.status(500).send({ error: "Internal server error" });
+  }
 };
 
-export default fileUpload;
+// send email to download the file
+// export const
