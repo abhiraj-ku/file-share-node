@@ -2,6 +2,8 @@ import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import File from "../models/fileModel.js";
+import { sendEmail } from "../services/sendEmail.js";
+import htmlTemplate from "../services/htmlEmailTemplate.js";
 
 // multer storage
 
@@ -51,4 +53,47 @@ export const fileUpload = async (req, res, next) => {
 };
 
 // send email to download the file
-// export const
+export const sendfileViaEmail = async (req, res) => {
+  const { uuid, emailTo, emailFrom, expiresIn } = req.body;
+
+  if (!uuid || !emailFrom || !emailTo) {
+    return res
+      .status(422)
+      .send({ error: "All fields are required except expiry" });
+  }
+
+  try {
+    const file = await File.findOne({ uuid: uuid });
+    if (file.sender) {
+      return res.status(422).send({ error: "Email already sent" });
+    }
+
+    file.sender = emailFrom;
+    file.reciever = emailTo;
+
+    const response = await file.save();
+    //send email
+
+    sendEmail({
+      from: emailFrom,
+      to: emailTo,
+      subject: "Shareit file sharing",
+      text: `${emailFrom} shared a file with you`,
+      html: htmlTemplate({
+        emailFrom,
+        downloadLink: `${process.env.APP_BASE_URL}/files/${file.uuid}?source=email`,
+        size: parseInt(file.size / 1000) + "KB",
+        expires: "24hr",
+      }),
+    })
+      .then(() => {
+        return res.json({ success: true });
+      })
+      .catch((err) => {
+        return res.status(500).json({ error: "Error in email sending." });
+      });
+  } catch (error) {
+    console.error("Error in sending email:", error);
+    res.status(500).send({ error: "Internal server error" });
+  }
+};
