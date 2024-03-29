@@ -18,7 +18,24 @@ const storage = multer.diskStorage({
 });
 
 //uploader with options to check the
-export const fileUpload = async (req, res, next) => {
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    // Check file type
+    const allowedTypes = ["image/jpg", "image/png", "application/pdf"];
+    if (!allowedTypes.includes(file.mimetype)) {
+      return cb(
+        new Error(
+          "Invalid file type. Only JPEG, PNG, and PDF files are allowed."
+        )
+      );
+    }
+    cb(null, true);
+  },
+  limits: { fileSize: 10 * 1024 * 1024 }, // Limit file size to 10 MB
+}).single("myfile");
+
+export const fileUpload = async (req, res) => {
   try {
     upload(req, res, async (err) => {
       if (err) {
