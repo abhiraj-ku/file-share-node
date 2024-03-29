@@ -5,20 +5,23 @@ import fileRoute from "./routes/fileRoutes.js";
 import downloadPageRoute from "./routes/dowloadpageRoute.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import morgan from "morgan";
 
 const app = express();
+const PORT = process.env.PORT || 7000;
 dotenv.config();
 connectDb();
-const PORT = process.env.PORT;
 
+app.use(express.static("public"));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
+// app.use(morgan("dev"));
 
 // template engine
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-app.set("views", path.join(__dirname, "/views"));
 app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "/views"));
 
 // Define routes and middleware here
 app.use("/api/files", fileRoute);

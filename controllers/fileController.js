@@ -22,7 +22,7 @@ const upload = multer({
   storage: storage,
   fileFilter: (req, file, cb) => {
     // Check file type
-    const allowedTypes = ["image/jpg", "image/png", "application/pdf"];
+    const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
     if (!allowedTypes.includes(file.mimetype)) {
       return cb(
         new Error(
