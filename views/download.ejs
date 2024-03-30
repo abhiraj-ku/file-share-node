@@ -6,14 +6,14 @@
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Download | Share-it File sharing made easy</title>
-    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="public/css/style.css">
 </head>
 
 <body>
-    <img src="/public/img/logo.png" alt="Inshare logo" class="logo">
+    <img src="public/img/logo.png" alt="shareit logo" class="logo">
 
     <section class="download">
-        <img class="download__icon" src="/public/img/download-sd.svg" alt="inshare-download">
+        <img class="download__icon" src="public/img/download-sd.svg" alt="download-icon">
         <% if(locals.error){ %>
             <h4>
                 <%= locals.error %> 😏
@@ -26,7 +26,7 @@
                         <%= fileName %>
                     </h4>
                     <small>
-                        <%= parseInt(size/1000) %> KB
+                        <%= parseInt(filesize/1000) %> KB
                     </small>
                 </div>
                 <div class="send-btn-container">

@@ -5,6 +5,8 @@ import File from "../models/fileModel.js";
 import { sendEmail } from "../services/sendEmail.js";
 import htmlTemplate from "../services/htmlEmailTemplate.js";
 
+const APP_BASE_URL = `http://localhost:7000`;
+
 // multer storage
 
 const storage = multer.diskStorage({
@@ -56,11 +58,11 @@ export const fileUpload = async (req, res) => {
         size: req.file.size,
       });
 
-      const savedFile = await file.save();
+      const response = await file.save();
 
       // Return the file URL to the client
       res.json({
-        fileUrl: `${process.env.APP_BASE_URL}/files/${savedFile.uuid}`,
+        file: `${APP_BASE_URL}/files/${response.uuid}`,
       });
     });
   } catch (error) {
